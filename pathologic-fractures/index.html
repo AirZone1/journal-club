@@ -1115,7 +1115,7 @@ a.chip:hover{outline:1.5px solid currentColor}
         cap:'עקומות Kaplan–Meier למטופלים עם ציון 0–3 (סיכון נמוך), 4–6 (בינוני) ו-7–10 (גבוה).',credit:'Fig. 3 · Katagiri H et al. Cancer Med 2014;3:1359-67 · CC BY'}
   };
   const imgFail=(img,f)=>{img.onerror=null; const box=document.createElement('div'); box.className='img-fallback'; box.innerHTML=`התמונה לא נטענה כאן. <a href="https://pmc.ncbi.nlm.nih.gov/articles/${f.pmc}/" target="_blank" rel="noopener">פתיחה ב-PMC ↗</a>`; img.replaceWith(box);};
-  const setImg=(img,key)=>{const f=FIGS[key]; img.alt=f.title; img.loading='lazy'; img.onerror=()=>imgFail(img,f); img.src=f.src;};
+  const setImg=(img,key)=>{const f=FIGS[key]; img.alt=f.title; img.decoding='async'; img.onerror=()=>imgFail(img,f); img.src=f.src;};
   $('#gallery').innerHTML=['w4','w5','w6','w7'].map(k=>`<button class="gcard" data-fig="${k}"><div class="ph"><img data-src="${k}"></div><div class="meta"><b>${esc(FIGS[k].title)}</b><span>${esc(FIGS[k].cap)}</span></div></button>`).join('');
   $$('img[data-src]').forEach(i=>setImg(i,i.dataset.src));
   const lb=$('#lightbox'), lbImg=$('#lb-img');
@@ -1428,7 +1428,7 @@ a.chip:hover{outline:1.5px solid currentColor}
     if(Math.abs(dx)>70 && Math.abs(dx)>Math.abs(dy)*1.5){ go(dx>0?cur+1:cur-1); } },{passive:true});
   window.addEventListener('hashchange',fromHash);
   slides.forEach((s,i)=>{ s.hidden=i!==0; });
-  go(0); fromHash();
+  { const m=/^#slide-(\d+)$/.exec(location.hash); go(m? +m[1]-1 : 0); }
   if(store.get('jc-pf-notes-open')==='1') toggleNotes(true);
 })();
 </script>
