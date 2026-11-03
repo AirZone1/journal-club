@@ -18,6 +18,7 @@
   --accent:#0b677c; --accent-ink:#ffffff; --accent-soft:#d9eaee;
   --ok:#2a7144; --ok-soft:#ddeee2; --warn:#9f4f0c; --warn-soft:#f6e5d2; --crit:#a12e29; --crit-soft:#f5dcd9;
   --font:"Heebo", "Assistant", "Arial Hebrew", Arial, sans-serif;
+  --film:#0b1317; --bone:#dce4e5; --film-ink:#9fb3b8; --film-hl:#5fc3d9;
   font-size:clamp(16px, 0.55vw + 10px, 19.5px);
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
@@ -50,9 +51,46 @@ button,input,select{font-family:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 
 .stage{overflow-y:auto;overflow-x:hidden;min-height:0;min-width:0}
-.slide{max-width:1200px;margin-inline:auto;padding-block:18px 26px;display:flex;flex-direction:column;gap:16px;animation:in .22s ease-out}
+.slide{max-width:1200px;margin-inline:auto;padding-block:18px 26px;display:flex;flex-direction:column;gap:16px}
 @keyframes in{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){.slide,.pane{animation:none!important}}
+@keyframes fromLeft{from{opacity:0;transform:translateX(-56px)}to{opacity:1;transform:none}}
+@keyframes fromRight{from{opacity:0;transform:translateX(56px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes glow{0%,100%{opacity:.35}50%{opacity:.75}}
+@keyframes ring{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.7);opacity:0}}
+@media (prefers-reduced-motion: no-preference){
+  .slide.enter-next{animation:fromLeft .42s cubic-bezier(.2,.75,.2,1)}
+  .slide.enter-prev{animation:fromRight .42s cubic-bezier(.2,.75,.2,1)}
+  .rise{animation:rise .55s cubic-bezier(.2,.75,.2,1) both;animation-delay:var(--d,0ms)}
+  .slide h2::after,.slide h1::after{animation:draw .7s .2s cubic-bezier(.2,.75,.2,1) both}
+  .score.pop,.rec.pop{animation:pop .35s ease-out}
+  .hl{animation:glow 1.6s ease-in-out infinite}
+  .pulse-2{animation:ring 1.9s ease-out infinite}
+  .pulse-3{animation:ring 1s ease-out infinite}
+  .pane{animation:in .18s ease-out}
+}
+.slide h2::after,.slide h1::after{content:"";display:block;width:64px;height:4px;border-radius:2px;background:var(--accent);margin-top:12px;transform-origin:right center}
+.score,.rec{display:inline-block;transform-origin:center}
+
+/* radiograph-style schematics */
+.calc.three{grid-template-columns:minmax(0,1.35fr) minmax(150px,190px) minmax(0,1fr)}
+@media (max-width: 980px){.calc.three{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.calc.three>.xray{order:3;grid-column:1 / -1}}
+@media (max-width: 860px){.calc.three{grid-template-columns:1fr}}
+.xray{margin:0;background:var(--film);border-radius:16px;padding:12px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;position:sticky;top:0;box-shadow:inset 0 0 40px rgba(0,0,0,.6)}
+.xray svg{width:100%;max-width:190px;height:auto;max-height:min(52vh,420px);display:block}
+.xray figcaption{color:var(--film-ink);font-size:.78rem;text-align:center;line-height:1.35}
+.xray .reg{cursor:pointer;fill:transparent;stroke:transparent;transition:fill .2s}
+.xray .reg:hover{fill:var(--film-hl);fill-opacity:.2}
+.xray .reg.on{fill:var(--film-hl);fill-opacity:.4;stroke:var(--film-hl);stroke-width:2}
+.xray .vert{cursor:pointer;transition:fill .25s, opacity .25s}
+.xray text{fill:var(--film-ink);font-size:11px;font-family:var(--font)}
+.mm-wrap{background:var(--film);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.mm-wrap svg{width:100%;height:auto;display:block}
+.mm-row{display:flex;align-items:center;gap:12px;color:var(--film-ink);font-size:.9rem}
+.mm-row input[type=range]{flex:1;accent-color:var(--accent);min-width:0}
+.mm-row b{color:var(--bone);font-size:1.1rem;font-variant-numeric:tabular-nums;min-width:4.5em;text-align:center}
 
 .eyebrow{font-size:.82rem;font-weight:700;letter-spacing:.04em;color:var(--accent)}
 h1,h2,h3{font-weight:800;line-height:1.2;margin:0;text-wrap:balance}
@@ -256,6 +294,29 @@ details.card .body{padding:0 16px 16px;display:flex;flex-direction:column;gap:8p
   .topbar{padding-block:6px}.footbar{padding-block:4px 6px}
   .btn{min-height:36px;padding:6px 12px}
 }
+/* imaging gallery + lightbox */
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px}
+.gcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;cursor:zoom-in;text-align:start;padding:0;font:inherit;color:inherit;transition:transform .2s,border-color .2s,box-shadow .2s}
+.gcard:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 10px 28px rgba(0,0,0,.14)}
+.gcard .ph{background:var(--film);height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gcard img{width:100%;height:100%;object-fit:contain;transition:transform .5s}
+.gcard:hover img{transform:scale(1.04)}
+.gcard .meta{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.gcard .meta b{font-size:1rem}
+.gcard .meta span{font-size:.86rem;color:var(--muted);line-height:1.45}
+.credit{font-size:.78rem;color:var(--muted)}
+.img-fallback{color:var(--film-ink);font-size:.85rem;padding:16px;text-align:center}
+.img-fallback a{color:var(--film-hl)}
+.lightbox{position:fixed;inset:0;z-index:40;background:rgba(6,10,12,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lightbox img{max-width:min(100%,1100px);max-height:72vh;object-fit:contain;border-radius:8px;background:#000}
+.lightbox .lb-cap{max-width:860px;color:#e4ecee;font-size:1rem;line-height:1.55;text-align:center}
+.lightbox .lb-credit{color:#a6b6ba;font-size:.82rem;text-align:center}
+.lightbox .lb-close{position:absolute;top:max(14px,env(safe-area-inset-top,0px));left:max(14px,env(safe-area-inset-left,0px))}
+@media (prefers-reduced-motion: no-preference){.lightbox:not([hidden]) img{animation:rise .35s cubic-bezier(.2,.75,.2,1)}}
+.ex-btn{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);background:var(--sunk);border-radius:12px;padding:6px;cursor:zoom-in;font:inherit;color:inherit;text-align:start}
+.ex-btn:hover{border-color:var(--accent)}
+.ex-btn img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:var(--film)}
+.ex-btn span{font-size:.86rem}
 /* speaker notes */
 .notes{border-top:2px solid var(--accent);background:var(--surface);max-height:34vh;overflow-y:auto;padding-block:12px;display:flex;flex-direction:column;gap:10px}
 .notes-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -277,7 +338,7 @@ a.chip:hover{outline:1.5px solid currentColor}
 <div class="app" dir="rtl" lang="he">
   <header class="topbar">
     <div class="brand">Journal Club · <span>שברים פתולוגיים</span></div>
-    <div class="counter" id="counter" aria-live="polite">שקף 1 מתוך 25</div>
+    <div class="counter" id="counter" aria-live="polite">שקף 1 מתוך 26</div>
     <button class="btn" id="notesBtn" aria-pressed="false" aria-controls="notes" title="הערות מרצה (N)">הערות<span class="hide-sm">&nbsp;מרצה</span></button>
     <button class="btn icon-btn hide-sm" id="fsBtn" title="מסך מלא (F)" aria-label="מסך מלא">⛶</button>
     <button class="btn" id="indexBtn" aria-haspopup="true" aria-controls="index">☰ <span class="hide-sm">אינדקס</span></button>
@@ -295,20 +356,20 @@ a.chip:hover{outline:1.5px solid currentColor}
       <div class="btn-row"><button class="btn primary" data-goto="2">להתחיל ←</button><button class="btn" data-goto="6">ישר למחשבונים</button></div>
     </div>
     <nav class="agenda" aria-label="סדר יום">
-      <button data-goto="2"><span class="num">0–5′</span><span>מקרה פתיחה (בדיוני)</span><span class="go">2</span></button>
+      <button data-goto="2"><span class="num">0–5′</span><span>מקרה פתיחה</span><span class="go">2</span></button>
       <button data-goto="3"><span class="num">5–12′</span><span>שכיחות, פרוגנוזה, ריפוי</span><span class="go">3</span></button>
       <button data-goto="5"><span class="num">12–20′</span><span>אבחון ומחשבונים</span><span class="go">5</span></button>
       <button data-goto="10"><span class="num">20–33′</span><span>6 מאמרי ליבה</span><span class="go">10</span></button>
       <button data-goto="17"><span class="num">33–38′</span><span>טיפול לפי מיקום וטיפול משלים</span><span class="go">17</span></button>
-      <button data-goto="21"><span class="num">38–43′</span><span>מחלוקות וחידון</span><span class="go">21</span></button>
-      <button data-goto="24"><span class="num">43–45′</span><span>סיכום</span><span class="go">24</span></button>
+      <button data-goto="22"><span class="num">38–43′</span><span>מחלוקות וחידון</span><span class="go">22</span></button>
+      <button data-goto="25"><span class="num">43–45′</span><span>סיכום</span><span class="go">25</span></button>
     </nav>
   </div>
 </section>
 
 <!-- 2 -->
 <section class="slide" data-title="מקרה פתיחה" data-group="פתיחה" hidden>
-  <div class="head"><span class="fiction">מקרה בדיוני</span><h2>כאב בירך בהליכה, שלושה שבועות</h2></div>
+  <div class="head"><h2>כאב בירך בהליכה, שלושה שבועות</h2></div>
   <div class="grid2">
     <div class="panel">
       <p>אישה בת 64, סרטן שד <span class="ltr">hormone receptor-positive</span>, גרורות עצם מרובות ידועות, קיבלה בעבר כימותרפיה.</p>
@@ -321,7 +382,7 @@ a.chip:hover{outline:1.5px solid currentColor}
         <button class="btn ghost" data-goto="6" style="justify-content:space-between">1. שבר מאיים או לא? <span>Mirels ←</span></button>
         <button class="btn ghost" data-goto="8" style="justify-content:space-between">2. כמה זמן היא צפויה לחיות? <span>Katagiri ←</span></button>
         <button class="btn ghost" data-goto="17" style="justify-content:space-between">3. Nail או endoprosthesis? <span>בורר מיקום ←</span></button>
-        <button class="btn ghost" data-goto="20" style="justify-content:space-between">4. קרינה לפני, אחרי, או בכלל לא? <span>טיפול משלים ←</span></button>
+        <button class="btn ghost" data-goto="21" style="justify-content:space-between">4. קרינה לפני, אחרי, או בכלל לא? <span>טיפול משלים ←</span></button>
       </div>
       
     </div>
@@ -413,7 +474,7 @@ a.chip:hover{outline:1.5px solid currentColor}
 <section class="slide" data-title="מחשבון Mirels" data-group="אבחון ומחשבונים" hidden>
   <div class="head"><h2>Mirels score</h2></div>
   <div class="preset-row"><span class="small muted">דוגמאות:</span><button class="btn" data-mirels="3,3,3,3">מקרה הפתיחה</button><button class="btn" data-mirels="1,2,2,2">הומרוס, מעורב</button><button class="btn" data-mirels="2,1,1,1">פמור, בלסטי קטן</button></div>
-  <div class="calc">
+  <div class="calc three">
     <form class="panel" id="mirels" onsubmit="return false">
       <fieldset class="field"><legend>Site · מיקום</legend><div class="seg">
         <input type="radio" name="m-site" id="m-site-1" value="1"><label for="m-site-1"><span class="pts">1</span>Upper limb</label>
@@ -436,6 +497,7 @@ a.chip:hover{outline:1.5px solid currentColor}
         <input type="radio" name="m-size" id="m-size-3" value="3" checked><label for="m-size-3"><span class="pts">3</span><span class="ltr">&gt; 2/3</span></label>
       </div></fieldset>
     </form>
+    <figure class="xray" id="m-fig" aria-label="תרשים הנגע לפי הבחירה"></figure>
     <div class="result" aria-live="polite">
       <div class="muted small">ציון Mirels (4–12)</div>
       <div class="score" id="m-score">12</div>
@@ -460,6 +522,11 @@ a.chip:hover{outline:1.5px solid currentColor}
     <div class="flow">
       <div class="panel">
         <h3>הכלל הפשוט: 30 מ"מ</h3>
+        <div class="mm-wrap">
+          <svg id="mm-svg" viewBox="0 0 400 120" aria-label="תרשים axial cortical involvement"></svg>
+          <div class="mm-row"><label for="mm">L-cort</label><input type="range" id="mm" min="5" max="70" step="1" value="40"><b id="mm-val">40 מ"מ</b></div>
+        </div>
+        <div class="verdict" id="mm-verdict"></div>
         <p>van der Linden 2003, מתוך RCT הקרינה ההולנדי, 102 מטופלים: <span class="ltr">axial cortical involvement</span> מעל 30 מ"מ ניבא שבר (<span class="ltr">P = 0.02</span>), עם NPV של 97%.</p>
         <p class="small muted">12 מתוך 14 הנגעים שנשברו היו מעל 30 מ"מ, וגם 40 מתוך 96 שלא נשברו. Willeumier ממליצים: מעל 30 מ"מ axial או מעל 50% circumferential.</p>
         <div class="chips"><span class="chip">PMID 14597353</span></div>
@@ -503,6 +570,7 @@ a.chip:hover{outline:1.5px solid currentColor}
       <div class="verdict" id="k-verdict"></div>
       <div class="bars" id="k-surv"></div>
       <p class="small muted" id="k-exact"></p>
+      <button class="ex-btn" data-fig="k3"><img alt="" data-src="k3"><span><b>עקומות Kaplan–Meier</b><br>לפי קבוצות 0–3, 4–6, 7–10 (Fig. 3)</span></button>
       <div class="chips"><span class="chip">PMID 25044999</span></div>
     </div>
   </div>
@@ -533,7 +601,7 @@ a.chip:hover{outline:1.5px solid currentColor}
 <!-- 17 location picker -->
 <section class="slide" data-title="בורר טיפול לפי מיקום" data-group="טיפול" hidden>
   <div class="head"><h2>איזה שתל, איפה?</h2><p class="lead">Willeumier 2016, Tables 2–3</p></div>
-  <div class="calc">
+  <div class="calc three">
     <form class="panel" id="loc" onsubmit="return false">
       <fieldset class="field"><legend>עצם</legend><div class="seg">
         <input type="radio" name="l-bone" id="l-bone-f" value="femur" checked><label for="l-bone-f">פמור</label>
@@ -550,12 +618,14 @@ a.chip:hover{outline:1.5px solid currentColor}
         <input type="radio" name="l-sv" id="l-sv-l" value="1" checked><label for="l-sv-l">יותר מ-6 חודשים</label>
       </div></fieldset>
     </form>
+    <figure class="xray" id="l-fig" aria-label="תרשים העצם; לחיצה על אזור בוחרת אותו"></figure>
     <div class="result" aria-live="polite">
       <div class="muted small">ההמלצה בטבלה</div>
       <div class="rec" id="l-rec"></div>
       <div class="verdict" id="l-warn" hidden></div>
       <p class="small" id="l-note"></p>
       <div class="gloss" id="l-gloss"></div>
+      <div id="l-example"></div>
       <p class="small muted">כל הטיפולים intralesional. Cement עם IMN כשההישרדות ארוכה או ש-bone stock לקוי.</p>
     </div>
   </div>
@@ -572,11 +642,18 @@ a.chip:hover{outline:1.5px solid currentColor}
   <p class="small muted" id="tbl-foot"></p>
 </section>
 
+<!-- 19 imaging -->
+<section class="slide" data-title="דוגמאות הדמיה" data-group="טיפול" hidden>
+  <div class="head"><h2>דוגמאות הדמיה</h2><p class="lead">Willeumier 2016 · לחיצה על תמונה מגדילה אותה</p></div>
+  <div class="gallery" id="gallery"></div>
+  <p class="credit">התמונות: Willeumier JJ et al. EFORT Open Rev 2016;1:136-145, Figs 4–7. CC BY-NC 4.0.</p>
+</section>
+
 <!-- 19 SINS -->
 <section class="slide" data-title="עמוד שדרה: מחשבון SINS" data-group="טיפול" hidden>
   <div class="head"><h2>SINS: Spinal Instability Neoplastic Score</h2></div>
   <div class="preset-row"><span class="small muted">דוגמאות:</span><button class="btn" data-sins="3,3,2,0,2,1">נגע ב-T12</button><button class="btn" data-sins="1,0,0,0,0,0">T6 בלסטי, ללא כאב</button><button class="btn" data-sins="2,3,2,4,3,3">L3 עם תזוזה</button></div>
-  <div class="calc">
+  <div class="calc three">
     <form class="panel" id="sins" onsubmit="return false">
       <fieldset class="field"><legend>Location</legend><div class="seg">
         <input type="radio" name="s-loc" id="s-loc-3" value="3" checked><label for="s-loc-3"><span class="pts">3</span>Junctional</label>
@@ -602,7 +679,7 @@ a.chip:hover{outline:1.5px solid currentColor}
       <fieldset class="field"><legend>Vertebral body collapse</legend><div class="seg">
         <input type="radio" name="s-col" id="s-col-3" value="3"><label for="s-col-3"><span class="pts">3</span><span class="ltr">&gt; 50%</span></label>
         <input type="radio" name="s-col" id="s-col-2" value="2" checked><label for="s-col-2"><span class="pts">2</span><span class="ltr">&lt; 50%</span></label>
-        <input type="radio" name="s-col" id="s-col-1" value="1"><label for="s-col-1"><span class="pts">1</span>No collapse, <span class="ltr">&gt; 50%</span> involved</label>
+        <input type="radio" name="s-col" id="s-col-1" value="1"><label for="s-col-1"><span class="pts">1</span><span class="ltr">No collapse, &gt; 50% involved</span></label>
         <input type="radio" name="s-col" id="s-col-0" value="0"><label for="s-col-0"><span class="pts">0</span>None</label>
       </div></fieldset>
       <fieldset class="field"><legend>Posterolateral involvement</legend><div class="seg">
@@ -611,6 +688,7 @@ a.chip:hover{outline:1.5px solid currentColor}
         <input type="radio" name="s-pl" id="s-pl-0" value="0"><label for="s-pl-0"><span class="pts">0</span>None</label>
       </div></fieldset>
     </form>
+    <figure class="xray" id="s-fig" aria-label="תרשים עמוד השדרה; לחיצה על חוליה בוחרת מיקום"></figure>
     <div class="result" aria-live="polite">
       <div class="muted small">ציון SINS (0–18)</div>
       <div class="score" id="s-score">11</div>
@@ -684,7 +762,7 @@ a.chip:hover{outline:1.5px solid currentColor}
 
 <!-- 23 case back -->
 <section class="slide" data-title="חזרה למקרה" data-group="דיון" hidden>
-  <div class="head"><span class="fiction">מקרה בדיוני</span><h2>חזרה למקרה הפתיחה</h2></div>
+  <div class="head"><h2>חזרה למקרה הפתיחה</h2></div>
   <div class="flow" data-steps id="case-steps">
     <div class="step"><span class="k">1</span><div><b>אבחנה:</b> ממאירות ידועה וגרורות מרובות; לפי Willeumier בדרך כלל אין צורך בביופסיה נוספת. בנגע בודד וראשון היינו שוקלים ביופסיה לפני קיבוע.</div></div>
     <div class="step"><span class="k">2</span><div><b>סיכון לשבר:</b> Mirels <span class="ltr">3 + 3 + 3 + 3 = 12</span>, ו-axial cortical involvement של כ-40 מ"מ. שבר מאיים.</div></div>
@@ -742,6 +820,12 @@ a.chip:hover{outline:1.5px solid currentColor}
       <div style="display:flex;justify-content:space-between;align-items:center"><h3>אינדקס שקפים</h3><button class="btn" id="indexClose">סגירה</button></div>
       <ol id="indexList"></ol>
     </nav>
+  </div>
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="תמונה מוגדלת">
+    <button class="btn lb-close" id="lb-close">סגירה (Esc)</button>
+    <img id="lb-img" alt="">
+    <div class="lb-cap" id="lb-cap"></div>
+    <div class="lb-credit" id="lb-credit"></div>
   </div>
   <div class="toast" id="toast" hidden></div>
 </div>
@@ -899,11 +983,155 @@ a.chip:hover{outline:1.5px solid currentColor}
   const ruler=(el,from,to,zone)=>{el.innerHTML=Array.from({length:to-from+1},(_,i)=>from+i).map(n=>`<div data-n="${n}" class="z-${zone(n)}">${n}</div>`).join('');};
   const mark=(el,s)=>el.querySelectorAll('div').forEach(d=>d.classList.toggle('on',+d.dataset.n===s));
 
+  // ---------- motion helpers ----------
+  const RM=window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
+  function pop(el){ if(RM.matches||!el) return; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+  function animateIn(sec,dir){
+    if(RM.matches) return;
+    sec.classList.remove('enter-next','enter-prev'); void sec.offsetWidth; sec.classList.add(dir>0?'enter-next':'enter-prev');
+    const top=[...sec.children].filter(el=>el.tagName!=='ASIDE');
+    const inner=[...sec.querySelectorAll('.grid2 > *, .grid3 > *, .stat-row > *, .flow > .step, .agenda > button, .matrix > *, .pros-cons > *, .disc > *')];
+    [...top,...inner].forEach(el=>el.classList.remove('rise'));
+    void sec.offsetWidth;
+    top.forEach((el,k)=>{el.style.setProperty('--d',(k*80)+'ms'); el.classList.add('rise');});
+    inner.forEach((el,k)=>{el.style.setProperty('--d',(140+Math.min(k,16)*45)+'ms'); el.classList.add('rise');});
+    sec.querySelectorAll('.bar .fill').forEach(f=>{
+      const w=f.dataset.w||(f.dataset.w=f.style.width);
+      f.style.transition='none'; f.style.width='0';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='width .8s cubic-bezier(.2,.75,.2,1) .25s'; f.style.width=w;}));
+    });
+    sec.querySelectorAll('.stat .v').forEach(el=>{
+      const o=el.dataset.orig||(el.dataset.orig=el.textContent);
+      if(!/\d/.test(o)) return;
+      const t0=performance.now(), D=800;
+      const step=now=>{const p=Math.min(1,Math.max(0,(now-t0-150)/D)), e=1-Math.pow(1-p,3);
+        el.textContent=o.replace(/\d+(?:\.\d+)?/g,m=>{const dec=(m.split('.')[1]||'').length; return (parseFloat(m)*e).toFixed(dec);});
+        if(p<1) requestAnimationFrame(step); else el.textContent=o;};
+      requestAnimationFrame(step);
+    });
+  }
+
+  // ---------- radiograph-style schematics (original drawings) ----------
+  const DEFS=p=>`<defs><pattern id="${p}-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#0b1317"/><line x1="0" y1="0" x2="0" y2="5" stroke="#dce4e5" stroke-width="2.4"/></pattern>
+    <radialGradient id="${p}-bg" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#f1f5f5"/><stop offset="1" stop-color="#b9c6c8"/></radialGradient></defs>`;
+  const BF=p=>`fill="url(#${p}-bg)"`;
+  const FEMUR=p=>{const B=BF(p);return `<path d="M12 54 A54 42 0 0 1 114 30" fill="none" stroke="#dce4e5" stroke-width="9" stroke-linecap="round" opacity=".5"/>
+    <path d="M62 66 L126 130" stroke="#c9d4d6" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="62" cy="64" r="31" ${B}/>
+    <ellipse cx="150" cy="104" rx="22" ry="32" ${B}/>
+    <path d="M104 100 L168 104 L154 198 L112 208 Z" ${B}/>
+    <ellipse cx="108" cy="186" rx="11" ry="13" ${B}/>
+    <rect x="110" y="160" width="40" height="270" rx="18" ${B}/>
+    <path d="M110 400 C 100 446, 70 462, 70 498 L 188 498 C 188 462, 160 446, 150 400 Z" ${B}/>
+    <ellipse cx="100" cy="506" rx="32" ry="24" ${B}/><ellipse cx="160" cy="506" rx="32" ry="24" ${B}/>
+    <rect x="122" y="200" width="16" height="226" rx="8" fill="#0b1317" opacity=".28"/>`;};
+  const HUMERUS=p=>{const B=BF(p);return `<path d="M30 26 Q 12 72 30 118" fill="none" stroke="#dce4e5" stroke-width="10" stroke-linecap="round" opacity=".5"/>
+    <circle cx="84" cy="72" r="40" ${B}/>
+    <ellipse cx="128" cy="78" rx="20" ry="26" ${B}/>
+    <path d="M56 94 L142 94 L128 162 L90 162 Z" ${B}/>
+    <rect x="90" y="140" width="36" height="300" rx="16" ${B}/>
+    <path d="M90 420 C 80 466, 50 478, 52 508 L 166 508 C 166 478, 136 466, 126 420 Z" ${B}/>
+    <ellipse cx="80" cy="514" rx="28" ry="18" ${B}/><ellipse cx="138" cy="514" rx="28" ry="18" ${B}/>
+    <rect x="101" y="178" width="14" height="236" rx="7" fill="#0b1317" opacity=".28"/>`;};
+  const REGSHAPE={
+    femur:{acet:'<ellipse cx="62" cy="34" rx="58" ry="24"/>',neck:'<ellipse cx="80" cy="84" rx="48" ry="44"/>',troch:'<rect x="96" y="96" width="80" height="120" rx="14"/>',diaph:'<rect x="100" y="218" width="60" height="184" rx="12"/>',meta:'<rect x="72" y="404" width="116" height="52" rx="12"/>',cond:'<rect x="58" y="458" width="144" height="76" rx="16"/>'},
+    humerus:{glen:'<rect x="4" y="18" width="42" height="108" rx="12"/>',prox:'<ellipse cx="98" cy="100" rx="64" ry="70"/>',shaft:'<rect x="80" y="172" width="56" height="246" rx="12"/>',dist:'<rect x="42" y="420" width="134" height="118" rx="14"/>'}
+  };
+  const GROUP={acet:'acet',neck:'neck',troch_good:'troch',troch_poor:'troch',diaph_small:'diaph',diaph_large:'diaph',meta:'meta',cond_small:'cond',cond_large:'cond',
+               prox_good:'prox',prox_poor:'prox',glen:'glen',shaft_small:'shaft',shaft_large:'shaft',dist:'dist'};
+  const VB={femur:'0 0 220 540',humerus:'0 0 200 540'};
+  function drawBone(bone,reg){
+    const g=GROUP[reg];
+    const regs=Object.entries(REGSHAPE[bone]).map(([k,s])=>s.replace(/^<(\w+)/,`<$1 class="reg${k===g?' on hl':''}" data-g="${k}"`)).join('');
+    $('#l-fig').innerHTML=`<svg viewBox="${VB[bone]}" role="img" aria-label="${bone==='femur'?'פמור':'הומרוס'}">${DEFS('l')}${bone==='femur'?FEMUR('l'):HUMERUS('l')}${regs}</svg><figcaption>לחצו על אזור בעצם</figcaption>`;
+  }
+  $('#l-fig').addEventListener('click',e=>{
+    const r=e.target.closest('.reg'); if(!r) return;
+    const bone=document.querySelector('input[name=l-bone]:checked').value, g=r.dataset.g;
+    const cur=document.querySelector('input[name=l-reg]:checked');
+    if(cur && GROUP[cur.value]===g) return;
+    const first=LOC[bone].regions.find(x=>GROUP[x[0]]===g); if(first){ setRadio('l-reg',first[0]); loc(); }
+  });
+  function lesion(cx,cy,size,les,pain){
+    const rx=[0,7,13,19][size], ry=24;
+    const fill=les===3?'#0b1317':les===2?'url(#m-hatch)':'#ffffff';
+    const ring=pain>1?`<ellipse class="${RM.matches?'':'pulse-'+pain}" cx="${cx}" cy="${cy}" rx="${rx+6}" ry="${ry+6}" fill="none" stroke="#ec8e87" stroke-width="2.5" style="transform-box:fill-box;transform-origin:center"/>`:'';
+    return `${ring}<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" fill-opacity="${les===1?.92:1}" stroke="${les===3?'#7d8f94':'#ffffff'}" stroke-width="1.5" ${les===3?'stroke-dasharray="3 2"':''}/>`;
+  }
+  function drawMirels(){
+    const site=val(mf,'m-site'), pain=val(mf,'m-pain'), les=val(mf,'m-les'), size=val(mf,'m-size');
+    const hum=site===1;
+    const pos=hum?[108,300]:site===3?[130,180]:[130,305];
+    const names={site:['','גפה עליונה','גפה תחתונה','פריטרוכנטרי'],les:['','בלסטי','מעורב','ליטי'],size:['','פחות מ-1/3','1/3 עד 2/3','יותר מ-2/3']};
+    $('#m-fig').innerHTML=`<svg viewBox="${hum?VB.humerus:VB.femur}" role="img" aria-label="תרשים">${DEFS('m')}${hum?HUMERUS('m'):FEMUR('m')}${lesion(pos[0],pos[1],size,les,pain)}</svg><figcaption>${names.site[site]} · ${names.les[les]} · ${names.size[size]}</figcaption>`;
+  }
+  // spine: [label, class, height, width]; J=junctional 3, M=mobile 2, S=semirigid 1, R=rigid 0
+  const SPINE=[['Occ','J',16,36]]
+    .concat([1,2,3,4,5,6,7].map(n=>['C'+n,(n<=2||n===7)?'J':'M',10,34]))
+    .concat([1,2,3,4,5,6,7,8,9,10,11,12].map(n=>['T'+n,(n<=2||n>=11)?'J':'S',12,40]))
+    .concat([1,2,3,4,5].map(n=>['L'+n,(n===1||n===5)?'J':'M',15,50]))
+    .concat([['S1','J',14,54],['S2–S5','R',34,54]]);
+  const CV={J:3,M:2,S:1,R:0}, CNAME={3:'Junctional',2:'Mobile',1:'Semirigid',0:'Rigid'};
+  const LABELS=new Set(['Occ','C1','C7','T1','T12','L1','L5','S1','S2–S5']);
+  function drawSpine(locVal){
+    let y=6, body='';
+    SPINE.forEach(([lab,c,h,w])=>{
+      const on=CV[c]===locVal, x=60-w/2;
+      body+=`<rect class="vert${on?' hl':''}" data-v="${CV[c]}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${lab==='Occ'?8:3}" fill="${on?'var(--film-hl)':'#dce4e5'}" opacity="${on?1:.38}"><title>${lab}</title></rect>`;
+      if(LABELS.has(lab)) body+=`<text x="100" y="${y+h/2+4}">${lab}</text>`;
+      y+=h+3;
+    });
+    $('#s-fig').innerHTML=`<svg viewBox="0 0 150 ${y+4}" role="img" aria-label="עמוד שדרה">${body}</svg><figcaption>${CNAME[locVal]} · לחצו על חוליה</figcaption>`;
+  }
+  $('#s-fig').addEventListener('click',e=>{const r=e.target.closest('.vert'); if(r){ setRadio('s-loc',r.dataset.v); sins(); }});
+  function drawMM(){
+    const mm=+$('#mm').value, sc=4.2, w=mm*sc, x0=200-w/2, hi=mm>30, col=hi?'#ec8e87':'#78c793', t=30*sc;
+    $('#mm-svg').innerHTML=`<rect x="8" y="44" width="384" height="40" rx="20" fill="#dce4e5"/>
+      <rect x="8" y="58" width="384" height="12" rx="6" fill="#0b1317" opacity=".28"/>
+      <rect x="${x0}" y="41" width="${w}" height="26" rx="10" fill="#0b1317" stroke="#7d8f94" stroke-dasharray="3 2"/>
+      <path d="M${x0} 34 V26 H${x0+w} V34" fill="none" stroke="${col}" stroke-width="2.5"/>
+      <text x="200" y="18" text-anchor="middle" fill="${col}" style="font-size:14px;font-weight:700">L-cort ${mm} mm</text>
+      <path d="M${200-t/2} 94 V102 H${200+t/2} V94" fill="none" stroke="#9fb3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="200" y="116" text-anchor="middle" style="font-size:11px">30 mm</text>`;
+    $('#mm-val').textContent=`${mm} מ"מ`;
+    const v=$('#mm-verdict');
+    if(hi){v.className='verdict v-high';v.textContent='מעל 30 מ"מ: סיכון גבוה לשבר. van der Linden: קיבוע מניעתי, או קרינה במינון כולל גבוה יותר אם מצב המטופל מוגבל.';}
+    else {v.className='verdict v-low';v.textContent='30 מ"מ ומטה: NPV 97%. van der Linden: 8 Gy במנה אחת להקלה בכאב.';}
+  }
+  $('#mm').addEventListener('input',drawMM); drawMM();
+
+  // ---------- figures from open-access papers (hotlinked from PMC) ----------
+  const W16='Willeumier JJ et al. EFORT Open Rev 2016;1:136-145 · CC BY-NC 4.0';
+  const FIGS={
+    w4:{src:'https://cdn.ncbi.nlm.nih.gov/pmc/blobs/d6f5/5367617/f43e0b8bc9ea/eor-1-136-g004.jpg',pmc:'PMC5367617',title:'PF-MTP אחרי שבר subtrochanteric',
+        cap:'גרורות לעצם ולריאות מסרטן שד. התקדמות הנגע בפמור הפרוקסימלי במשך חודש, עם שבר פתולוגי subtrochanteric. הישרדות צפויה מעל 6 חודשים. טופל ב-PF-MTP עם cement.',credit:'Fig. 4 · '+W16},
+    w5:{src:'https://cdn.ncbi.nlm.nih.gov/pmc/blobs/d6f5/5367617/d1f44bdb0589/eor-1-136-g005.jpg',pmc:'PMC5367617',title:'IMN עם curettage ו-cement בדיאפיזה',
+        cap:'גרורות לעצם ולמוח ממלנומה. שבר פתולוגי בדיאפיזת הפמור אחרי הסתובבות במיטה. הישרדות צפויה פחות מ-6 חודשים. intramedullary nail עם curettage ו-augmentation של הנגע.',credit:'Fig. 5 · '+W16},
+    w6:{src:'https://cdn.ncbi.nlm.nih.gov/pmc/blobs/d6f5/5367617/e63c7e188315/eor-1-136-g006.jpg',pmc:'PMC5367617',title:'DF-MTP בפמור הדיסטלי',
+        cap:'גרורה בודדת מ-NSCLC שאובחן וטופל 4.5 שנים קודם. הרס נרחב בפמור הדיסטלי, שנה וחצי אחרי קרינה לנגע. הישרדות צפויה מעל 6 חודשים. כריתה ושחזור ב-DF-MTP.',credit:'Fig. 6 · '+W16},
+    w7:{src:'https://cdn.ncbi.nlm.nih.gov/pmc/blobs/d6f5/5367617/b3b0b22e2377/eor-1-136-g007.jpg',pmc:'PMC5367617',title:'הומרוס: plate + cement מול nail + helical blade',
+        cap:'a) סרטן ריאה: שבר פתולוגי בדיאפיזה הפרוקסימלית של ההומרוס, הישרדות צפויה פחות מ-6 חודשים, plate עם cement. b) RCC: שבר באותו אזור, הישרדות צפויה פחות מ-6 חודשים, embolization לפני ניתוח ו-intramedullary nail עם cement ו-helical blade.',credit:'Fig. 7 · '+W16},
+    k3:{src:'https://cdn.ncbi.nlm.nih.gov/pmc/blobs/00a6/4302686/6cd56045a8e7/cam40003-1359-f3.jpg',pmc:'PMC4302686',title:'Katagiri: הישרדות לפי קבוצת סיכון',
+        cap:'עקומות Kaplan–Meier למטופלים עם ציון 0–3 (סיכון נמוך), 4–6 (בינוני) ו-7–10 (גבוה).',credit:'Fig. 3 · Katagiri H et al. Cancer Med 2014;3:1359-67 · CC BY'}
+  };
+  const imgFail=(img,f)=>{img.onerror=null; const box=document.createElement('div'); box.className='img-fallback'; box.innerHTML=`התמונה לא נטענה כאן. <a href="https://pmc.ncbi.nlm.nih.gov/articles/${f.pmc}/" target="_blank" rel="noopener">פתיחה ב-PMC ↗</a>`; img.replaceWith(box);};
+  const setImg=(img,key)=>{const f=FIGS[key]; img.alt=f.title; img.loading='lazy'; img.onerror=()=>imgFail(img,f); img.src=f.src;};
+  $('#gallery').innerHTML=['w4','w5','w6','w7'].map(k=>`<button class="gcard" data-fig="${k}"><div class="ph"><img data-src="${k}"></div><div class="meta"><b>${esc(FIGS[k].title)}</b><span>${esc(FIGS[k].cap)}</span></div></button>`).join('');
+  $$('img[data-src]').forEach(i=>setImg(i,i.dataset.src));
+  const lb=$('#lightbox'), lbImg=$('#lb-img');
+  function openFig(key){const f=FIGS[key]; lbImg.onerror=null; lbImg.src=f.src; lbImg.alt=f.title; $('#lb-cap').textContent=f.cap; $('#lb-credit').innerHTML=`${esc(f.credit)} · <a href="https://pmc.ncbi.nlm.nih.gov/articles/${f.pmc}/" target="_blank" rel="noopener" style="color:inherit">PMC ↗</a>`; lb.hidden=false; $('#lb-close').focus();}
+  function closeFig(){lb.hidden=true;}
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-fig]'); if(b){openFig(b.dataset.fig);}});
+  lb.addEventListener('click',e=>{ if(e.target===lb||e.target.id==='lb-close') closeFig(); });
+  const EXAMPLE={troch_poor:'w4',troch_good:'w4',diaph_small:'w5',diaph_large:'w5',meta:'w6',cond_small:'w6',cond_large:'w6',shaft_small:'w7',shaft_large:'w7',prox_poor:'w7',prox_good:'w7'};
+  function showExample(reg){const k=EXAMPLE[reg], el=$('#l-example'); if(!k){el.innerHTML='';return;}
+    el.innerHTML=`<button class="ex-btn" data-fig="${k}"><img data-src="${k}"><span><b>דוגמה מהספרות</b><br>${esc(FIGS[k].title)}</span></button>`; setImg(el.querySelector('img'),k);}
+
   // ---------- Mirels ----------
   const mf=$('#mirels'), mr=$('#m-ruler'); ruler(mr,4,12,n=>n<=7?'low':n===8?'mid':'high');
   function mirels(){
     const s=val(mf,'m-site')+val(mf,'m-pain')+val(mf,'m-les')+val(mf,'m-size');
-    $('#m-score').textContent=s; mark(mr,s);
+    $('#m-score').textContent=s; pop($('#m-score')); mark(mr,s); drawMirels();
     const v=$('#m-verdict'), n=$('#m-note');
     if(s<=7){v.className='verdict v-low';v.textContent='סיכון נמוך: אפשר להקרין';n.textContent='Mirels 1989: ציון 7 ומטה אפשר להקרין בלי קיבוע.';}
     else if(s===8){v.className='verdict v-mid';v.textContent='אזור אפור';n.textContent='Mirels 1989 המליץ על קיבוע מניעתי מ-8; הסף המקובל כיום הוא 9 ומעלה (Salaja 2026). שקלו CT ו-axial cortical involvement.';}
@@ -939,7 +1167,7 @@ a.chip:hover{outline:1.5px solid currentColor}
     const p=val(kf,'k-prim'), lab=val(kf,'k-lab');
     const s=p+val(kf,'k-visc')+lab+['k-ps','k-chemo','k-mult'].filter(id=>document.getElementById(id).checked).length;
     $('#k-prim-help').textContent=PRIM[p]; $('#k-lab-help').textContent=LAB[lab];
-    $('#k-score').textContent=s;
+    $('#k-score').textContent=s; pop($('#k-score'));
     const g=s<=3?T6[0]:s<=6?T6[1]:T6[2];
     const v=$('#k-verdict'); v.className='verdict '+g.c; v.textContent=`קבוצה ${g.r}`;
     $('#k-surv').innerHTML=['6 חודשים','שנה','שנתיים'].map((l,i)=>`<div class="bar"><span>${l}</span><div class="track"><div class="fill" style="width:${g.s[i]}%"></div></div><span class="n">${g.s[i].toFixed(1)}%</span></div>`).join('');
@@ -1011,7 +1239,7 @@ a.chip:hover{outline:1.5px solid currentColor}
     const svRaw=lf.querySelector('input[name=l-sv]:checked').value;
     const sv=svRaw==='w'?0:+svRaw;
     const rec=R0[2][fx+sv];
-    $('#l-rec').textContent=rec;
+    $('#l-rec').textContent=rec; pop($('#l-rec')); drawBone(bone, reg.value); showExample(reg.value);
     const w=$('#l-warn');
     if(svRaw==='w'){w.hidden=false;w.className='verdict v-mid';w.textContent='פחות מ-6 שבועות: בדרך כלל טיפול שמרני. אם ניתוח הכרחי, מינימלי ככל האפשר. ההמלצה למעלה היא עמודת ההישרדות הקצרה.';}
     else w.hidden=true;
@@ -1041,7 +1269,7 @@ a.chip:hover{outline:1.5px solid currentColor}
   const sf=$('#sins'), sr=$('#s-ruler'); ruler(sr,0,18,n=>n<=6?'low':n<=12?'mid':'high');
   function sins(){
     const s=['s-loc','s-pain','s-les','s-al','s-col','s-pl'].reduce((a,n)=>a+val(sf,n),0);
-    $('#s-score').textContent=s; mark(sr,s);
+    $('#s-score').textContent=s; pop($('#s-score')); mark(sr,s); drawSpine(val(sf,'s-loc'));
     const v=$('#s-verdict'), n=$('#s-note');
     if(s<=6){v.className='verdict v-low';v.textContent='Stable (0–6)';n.textContent='לא נדרשת התייעצות על יציבות לפי SINS.';}
     else if(s<=12){v.className='verdict v-mid';v.textContent='Potentially unstable (7–12)';n.textContent='SINS 7 ומעלה: התייעצות עם מנתח עמוד שדרה.';}
@@ -1099,7 +1327,7 @@ a.chip:hover{outline:1.5px solid currentColor}
   // ---------- speaker notes ----------
   const NOTES=[
     ["2′",["לפתוח בשאלה: מי ראה השבוע שבר פתולוגי במיון?","להציג את המבנה: מקרה, כלים, מאמרים, החלטה.","6 מאמרי ליבה ו-10 מחקרים תומכים."],"היום נלמד להחליט על שני צירים: סיכון לשבר וזמן הישרדות."],
-    ["3′",["להדגיש שהמקרה בדיוני.","לא לפתור עכשיו: לבקש הצבעה ביד על כל אחת מארבע השאלות.","לרשום על הלוח כמה בחרו nail וכמה endoprosthesis, ולחזור לזה בשקף 23."],"מי היה מנתח אותה הלילה? מי היה מקרין קודם?"],
+    ["3′",["לא לפתור עכשיו: לבקש הצבעה ביד על כל אחת מארבע השאלות.","לרשום על הלוח כמה בחרו nail וכמה endoprosthesis, ולחזור לזה בשקף 24."],"מי היה מנתח אותה הלילה? מי היה מקרין קודם?"],
     ["3′",["הפמור הוא 64% מהמנותחים: זה הקהל שלנו במיון.","מיאלומה ושד מובילים בשיעור השברים.","Saad הוא ניתוח של RCTs על bisphosphonates, לא מחקר אורתופדי."],"שימו לב: רוב המנותחים מגיעים כבר עם שבר, לא כשבר מאיים."],
     ["3′",["HR 1.32 בשד: השבר עצמו קשור לתמותה.","Philipp: לא לטעון שקיבוע מניעתי מאריך חיים. המחברים עצמם אומרים שזו כנראה הטיית בחירה.","Gainor: ריאה 0% ריפוי. ההחלטה על השתל נגזרת מזה."],"אם השבר לא יתאחה, מה השתל צריך לעשות לבד?"],
     ["4′",["השקף הכי חשוב בטיחותית: נגע לא ידוע = primary bone tumour עד שיוכח אחרת.","ללחוץ 'השלב הבא' שלב אחר שלב.","Rougraff: האסטרטגיה מזהה 85%; ביופסיה לבד לא זיהתה מקור ב-65%."],"מי הכניס פעם מסמר לפני שהייתה אבחנה? מה היה קורה אם זו הייתה סרקומה?"],
@@ -1116,6 +1344,7 @@ a.chip:hover{outline:1.5px solid currentColor}
     ["2′",["להשתמש בסינון לפי נושא.","לפתוח 2–3 כרטיסים לפי שאלות מהקהל.","Steensma: בעד endoprosthesis."],"לא חייבים לעבור על כולם. זה בנק לשאלות."],
     ["3′",["להריץ את המקרה: פמור, inter/subtroch, מאיים, יותר מ-6 חודשים.","להחליף ל-bone stock לקוי ולראות את השינוי.","לעבור להומרוס ולהראות את הדגש על cement."],"מה משתנה כשמורידים את ההישרדות לפחות מ-6 שבועות?"],
     ["1′",["שקף עיון. השורה שנבחרה בבורר מסומנת.","טוב להשאיר על המסך בזמן שאלות."],""],
+    ["2′",["ארבעה מקרים מ-Willeumier 2016: PF-MTP, IMN עם cement, DF-MTP, הומרוס.","לפתוח כל תמונה ולשאול: מה הייתם עושים לפני שקוראים את הכיתוב?","לקשר כל מקרה לתא המתאים בבורר המיקום."],"איזה מהמקרים הייתם מטפלים אחרת?"],
     ["2′",["דוגמת T12: 11, potentially unstable.","לשנות alignment ל-subluxation ולראות את הקפיצה.","7 ומעלה: התייעצות עם מנתח עמוד שדרה."],"מי בקהל מחשב SINS בשגרה במיון?"],
     ["2′",["Embolization בכליה ובתירואיד, ניתוח תוך 72 שעות.","8 Gy במנה אחת לנגע כואב בסיכון נמוך.","van der Linden: ההבדל במשטר הקרינה נעלם אחרי תיקון ל-30 מ\"מ."],"מי מבקש embolization לפני כל RCC? כמה זמן זה לוקח אצלנו?"],
     ["3′",["זו המחלוקת המרכזית: nail או endoprosthesis.","להציג את שני הצדדים בלי להכריע.","להזכיר שאין RCT באף אחת מהשאלות."],"אילו נתונים היו משכנעים אתכם לשנות נוהג?"],
@@ -1146,6 +1375,7 @@ a.chip:hover{outline:1.5px solid currentColor}
   let cur=0;
   function go(i){
     i=Math.max(0,Math.min(N-1,i));
+    const dir=i>=cur?1:-1, changed=i!==cur||go.first===undefined; go.first=false;
     if(i!==cur){ slides[cur].hidden=true; stage.scrollTop=0; }
     slides[i].hidden=false; cur=i;
     $('#counter').textContent=`שקף ${i+1} מתוך ${N}`;
@@ -1154,6 +1384,7 @@ a.chip:hover{outline:1.5px solid currentColor}
     list.querySelectorAll('button.it').forEach(b=>b.setAttribute('aria-current', +b.dataset.i===i?'true':'false'));
     const h='#slide-'+(i+1); if(location.hash!==h){ try{history.replaceState(null,'',h);}catch(e){} }
     renderNotes(i);
+    if(changed) animateIn(slides[i],dir);
   }
   window.go=go;
   function fromHash(){const m=/^#slide-(\d+)$/.exec(location.hash); if(m) go(+m[1]-1);}
@@ -1172,6 +1403,7 @@ a.chip:hover{outline:1.5px solid currentColor}
   $('#fsBtn').onclick=fullscreen;
   document.addEventListener('keydown',e=>{
     if(e.altKey||e.ctrlKey||e.metaKey) return;
+    if(!lb.hidden){ if(e.key==='Escape'){ closeFig(); e.preventDefault(); } return; }
     if(!idx.hidden){ if(e.key==='Escape') closeIndex(); return; }
     const t=e.target, tag=(t.tagName||'').toLowerCase();
     const typing=(tag==='input'&&!['radio','checkbox'].includes(t.type))||tag==='select'||tag==='textarea'||t.isContentEditable;
